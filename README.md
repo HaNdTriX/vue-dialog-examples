@@ -17,7 +17,7 @@ This is because dialogs can be used in two different ways:
 
 ```jsx
 function handleSomeKindOfEffect() {
-  const resturnValues = await revealDialog()
+  const resturnValues = await dialogRef.value.reveal()
 }
 ```
 
@@ -25,11 +25,11 @@ From my point of view both ways a totally valid to use. There is nothing bad abo
 
 ```jsx
 async function handleSomeKindOfEffect() {
-  const { confirmed } = await revealDialog1();
+  const { confirmed } = await dialog1Ref.value.reveal();
   if (confirmed) {
-    await revealDialog2();
+    await dialog2Ref.value.reveal();
   } else {
-    await revealDialog3();
+    await dialog3Ref.value.reveal();
   }
 }
 ```
