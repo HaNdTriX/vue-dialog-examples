@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import MyDialogContent from "./MyDialogContent.vue";
-import { defineModel, useSlots } from "vue";
+import { defineModel, useSlots, ref } from "vue";
 import { useConfirmDialog } from "@vueuse/core";
 
 /**
@@ -22,12 +22,18 @@ const open = defineModel<boolean>("open", {
  * Use this pattern if you want to to open or close the Dialog
  * from within a method (e.g.: an event handler).
  **/
-type RevealData = {};
+type RevealData = Record<string, string>;
 type ConfirmData = { data: string };
 type CancelData = { data: string };
 const imperativeHandle = useConfirmDialog<RevealData, ConfirmData, CancelData>(
   open
 );
+
+imperativeHandle.onReveal((data) => {
+  revealData.value = data;
+});
+
+const revealData = ref<RevealData>({});
 
 // Here we expose the imperative API to the parent component.
 // Later this api can be accesed via the ref attribute.
@@ -67,6 +73,7 @@ const slots = useSlots();
         otherwise it will be mounted immediately 
       -->
       <MyDialogContent
+        :data="revealData"
         v-model:open="open"
         @cancel="imperativeHandle.cancel"
         @confirm="imperativeHandle.confirm"

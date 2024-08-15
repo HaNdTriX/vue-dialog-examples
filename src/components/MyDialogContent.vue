@@ -18,6 +18,11 @@
     </ul>
   </section>
 
+  <section>
+    <h2 class="font-semibold">Reveal Data</h2>
+    <pre class="rounded border p-2">{{ JSON.stringify(data, null, 2) }}</pre>
+  </section>
+
   <section class="flex flex-col space-y-2">
     <h2 class="font-semibold">Trigger Buttons:</h2>
     <!-- 
@@ -56,6 +61,14 @@ import { useQuery } from "@tanstack/vue-query";
 const open = defineModel("open", {
   type: Boolean,
   default: false,
+});
+
+type Props = {
+  data?: Record<string, string>;
+};
+
+withDefaults(defineProps<Props>(), {
+  data: () => ({}),
 });
 
 defineEmits<{
