@@ -64,12 +64,12 @@ const open = defineModel("open", {
 });
 
 type Props = {
-  data?: Record<string, string>;
+  data: {
+    foo: string;
+  };
 };
 
-withDefaults(defineProps<Props>(), {
-  data: () => ({}),
-});
+defineProps<Props>();
 
 defineEmits<{
   // Declarative way
