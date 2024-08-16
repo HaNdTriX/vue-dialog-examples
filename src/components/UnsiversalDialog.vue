@@ -1,6 +1,14 @@
-<script setup lang="ts" generic="T extends Component">
+<script
+  setup
+  lang="ts"
+  generic="T extends Component<{
+    data: unknown;
+    open: boolean;
+    onConfirm: (data: unknown) => void;
+    onCancel: (data: unknown) => void;
+  }>"
+>
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import MyDialogContent from "./MyDialogContent.vue";
 import { useConfirmDialog } from "@vueuse/core";
 import type { ComponentProps, ComponentEmit } from "vue-component-type-helpers";
 import { type Component } from "vue";
@@ -19,6 +27,17 @@ const data = defineModel<RevealData>("data", {
   default: {},
 });
 
+/**
+ * Define optional TriggerButton slot
+ */
+const slots = defineSlots<{
+  default?: (props: unknown) => unknown;
+}>();
+
+const props = defineProps<{
+  content: T;
+}>();
+
 type ComponentEvent<ComponentType, EventName> =
   ComponentEmit<ComponentType> extends (
     event: EventName,
@@ -32,9 +51,9 @@ type ComponentEvent<ComponentType, EventName> =
  * Use this pattern if you want to to open or close the Dialog
  * from within a method (e.g.: an event handler).
  **/
-type RevealData = ComponentProps<typeof MyDialogContent>["data"];
-type ConfirmData = ComponentEvent<typeof MyDialogContent, "confirm">;
-type CancelData = ComponentEvent<typeof MyDialogContent, "cancel">;
+type RevealData = ComponentProps<T>["data"];
+type ConfirmData = ComponentEvent<T, "confirm">;
+type CancelData = ComponentEvent<T, "cancel">;
 
 const imperativeHandle = useConfirmDialog<RevealData, ConfirmData, CancelData>(
   open
@@ -49,10 +68,7 @@ imperativeHandle.onReveal((revealData) => {
 // Later this api can be accesed via the ref attribute.
 defineExpose(imperativeHandle);
 
-const slots = defineSlots<{
-  default?: (props: unknown) => unknown;
-  content: T;
-}>();
+// TODO: Forward other props to DialogContent
 </script>
 
 <template>
@@ -70,12 +86,8 @@ const slots = defineSlots<{
     </DialogTrigger>
 
     <DialogContent>
-      <!-- 
-        If MyDialogContent has any effects (e.g. fetching data)
-        then it must not be inline (be in it's own file)
-        otherwise it will be mounted immediately 
-      -->
-      <MyDialogContent
+      <component
+        :is="props.content"
         :data="data"
         v-model:open="open"
         @cancel="imperativeHandle.cancel"
